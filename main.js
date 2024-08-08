@@ -8,7 +8,7 @@ const state = [], path=[], crossRoad=[], falsePath=[], correctPath=[];
 let randomG = false, maze=false, pathfinder =false ;
 let isMouseDown = false ;
 let mouseX, mouseY;
-let counter=0, a, b, c, x1, y1, randomDirection, k, width, height, startLocation, finalLocation;
+let counter=0, a, b, c, x1, y1, randomDirection, k, width, height, startLocation, finalLocation, lengthPath ;
 let left, right, up, down, position;
 
 
@@ -321,12 +321,12 @@ function correctDirection(i){
 function changeRoads(lengthCross, x1,y1,i){
     if ( crossRoad[lengthCross].r && Math.abs(x1+30 - path[i+1].x) < Math.abs(x1 - path[i+1].x)  ){
         crossRoad[lengthCross].r = false; return {x:x1+30, y:y1};
-    
-    }else if ( crossRoad[lengthCross].l && Math.abs(x1-30 - path[i+1].x) < Math.abs(x1 - path[i+1].x)  ){
-        crossRoad[lengthCross].l = false; return {x:x1-30, y:y1};
 
     }else if ( crossRoad[lengthCross].u && Math.abs(y1-30 - path[i+1].y) < Math.abs(y1 - path[i+1].y)  ){
         crossRoad[lengthCross].u = false; return {x:x1, y:y1-30};
+    
+    }else if ( crossRoad[lengthCross].l && Math.abs(x1-30 - path[i+1].x) < Math.abs(x1 - path[i+1].x)  ){
+        crossRoad[lengthCross].l = false; return {x:x1-30, y:y1};
     
     }else if ( crossRoad[lengthCross].d && Math.abs(y1+30 - path[i+1].y) < Math.abs(y1 - path[i+1].y)  ){
         crossRoad[lengthCross].d = false; return {x:x1, y:y1+30};
@@ -395,11 +395,19 @@ function renderGame() {
     if (startLocation!=undefined){drawSquare(startLocation.x, startLocation.y, 30,'red');if(path.length==0){path[0]=startLocation;}}
     if (finalLocation!=undefined){if(pathfinder || path.length==1){path.push(finalLocation)};drawSquare(finalLocation.x, finalLocation.y, 30,'green');}
 
-    if (path.length>0 && maze ){
+    if (path.length>2 && maze ){
         if (!pathfinder){
 
+            if (3<path.length){
+                lengthPath = path.length-2;
+                addCorrectPath();
+
+            }
             for (let i=1; i<path.length-1; i++){
-                drawSquareBorder(path[i].x, path[i].y, 30,'yellow','black');
+                drawSquareBorder(path[i].x, path[i].y, 30,'aqua','black');
+            }
+            for (let i=0; i<correctPath.length-1; i++){
+                drawSquareBorder(correctPath[i].x, correctPath[i].y, 30,'yellow','black');
             }
             for (let i=0; i<falsePath.length; i++){
                 drawSquareBorder(falsePath[i].x, falsePath[i].y, 30,'aqua','black');
@@ -415,6 +423,11 @@ function renderGame() {
             }
         }
     }
+
+}
+function addCorrectPath(){
+    correctPath.push(path[lengthPath]);
+    path.splice(lengthPath,1)
 
 }
     // Draw game
