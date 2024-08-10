@@ -5,11 +5,13 @@
 }
 
 body {
-    background: #3e3e42;
+    background: #bdbdfe;
     padding: 1rem;
 }
 
 
 .center {
     text-align: center;
+    color: rgb(255, 255, 255);
+    margin-bottom: 10px;
 }
