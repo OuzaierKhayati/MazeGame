@@ -2,10 +2,13 @@
 const canvas = getCanvas();
 const ctx = canvas.getContext("2d");
 const rect = canvas.getBoundingClientRect();//get the canva's bounding rectangle
-const sizeSquare = 25;
+const sizeSquare = 20, speed=2;
+let controlSpeed;
 
 const state = [];
-let mouseX, mouseY, startWidth=0, startHeight=0, endWidth=0, endHeight=0, isMouseDown=false;
+let mouseX, mouseY, endWidth, endHeight, isMouseDown=false;
+
+let finder=false;
 
 let maze=[], left, right, up, down, position, randomDirection, counter=0, k; 
 let randomG =false, randomMaze=false ;
@@ -25,24 +28,23 @@ function getCanvas() {
 function setCanvasSize() {
     const parent = canvas.parentNode;
     canvas.width = parent.offsetWidth;
+    while(canvas.width%sizeSquare !=0){
+        canvas.width++;
+    }endWidth=canvas.width;
+    
     canvas.height = parent.offsetHeight;
-}
-
-function getCanvasSize() {
-    return {
-        width: canvas.width,
-        height: canvas.height
-    }
+    while(canvas.height%sizeSquare !=0){
+        canvas.height++;
+    }endHeight=canvas.height;
 }
 
 function clearScreen() {
-    const { width, height } = getCanvasSize();
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, endWidth, endHeight);
 }
 
-function drawSquare(x, y, size, fill,border) {
+function drawSquare(x, y, size, fill,border,bordersize) {
     ctx.fillStyle = fill;
-    ctx.lineWidth= 0.5 ;
+    ctx.lineWidth= bordersize ;
     ctx.strokeStyle = border;
     ctx.fillRect(x, y, size, size);
     ctx.strokeRect(x,y,size,size);
@@ -104,10 +106,10 @@ function randomDirectionTest(a,b,direction,position){
     if(k==maze.length){x1=maze[k-1].x+a; y1=maze[k-1].y+b;}
     else{x1=maze[k].x+a; y1=maze[k].y+b;}
         
-    if ((startWidth<=x1) && (x1<=endWidth-sizeSquare) && (startHeight<=y1) && (y1<=endHeight-sizeSquare) && direction.value ){
+    if ((0<=x1) && (x1<=endWidth-sizeSquare) && (0<=y1) && (y1<=endHeight-sizeSquare) && direction.value ){
 
         if (testCounter(direction)) {
-            position.value = true; maze.push({x:x1, y:y1}); k=maze.length; }
+            position.value = true;controlSpeed++; maze.push({x:x1, y:y1}); k=maze.length; }
                 
     }else{ direction.value = false ; randomDirection=Math.floor(Math.random()*4);}
 
@@ -115,21 +117,23 @@ function randomDirectionTest(a,b,direction,position){
 }
 
 function mazeGenerator(){
+    controlSpeed=0;
     randomDirection=Math.floor(Math.random()*4),position={value:false};
     left={value: true}, right={value: true}, up={value: true}, down={value: true};
     if (k==undefined){
-        maze.push({x:((Math.floor(Math.random()*36)+1)*sizeSquare)+startWidth, y:((Math.floor(Math.random()*20)+1)*sizeSquare)+startHeight});
+        maze.push({x:(Math.floor(Math.random()*36)+1)*sizeSquare, y:(Math.floor(Math.random()*20)+1)*sizeSquare});
         k=maze.length;
     }
     else {
-        while (!position.value){
+        while (!position.value || controlSpeed<speed){
+            position.value = false;
             if (!right.value && !left.value && !up.value && !down.value){
                 if (k>1){
                     if(counter==0 ){if (k==maze.length){k-=2;}else{k--;}; a=k+1; b=k; c=k-1;}
                     else if (counter==1){k-=2; counter=0;; a=k+1; b=k; c=k-1;}
     
                 }
-                else {position.value=true; randomG=false}
+                else {position.value=true; randomG=false,controlSpeed=speed}
                 left={value: true}; right={value: true}; up={value: true}; down={value: true};
             }
             else if (randomDirection==0){ randomDirectionTest(sizeSquare,0,right,position);
@@ -154,16 +158,18 @@ function mazeGenerator(){
 function verifyPositionLocation(x,y){
     if(finalLocation.x==x && finalLocation.y==y){
         return true;
-    }
-    else{
+    
+    }else{
         for (let i =0; i<maze.length; i++){
-        if (maze[i].x==x && maze[i].y==y){
-            return true;
-        }
+            if (maze[i].x==x && maze[i].y==y){
+                return true;
+            }}
     }
     return false ;
-    }
 }
+    
+
+
 
 function correctDirection(i){
 
@@ -328,54 +334,133 @@ function changeRoads(lengthCross, x1,y1,i){
 }
 
 function pathFinder(){
-    let i=path.length-2, addition = false;
+    let i,addition=false;
+    controlSpeed=0;
 
-    while (pathfinder && !addition){
-        
+    while (pathfinder && (!addition || controlSpeed<speed)){
+        i=path.length-2; addition = false;
         if(path[i].y==path[path.length-1].y && path[i].x==path[path.length-1].x ){
             path.pop();
             pathfinder=false;
         }
-        else {path.push (correctDirection(i)); addition = true;}
+        else {path.push (correctDirection(i)); addition = true;controlSpeed++;}
+        if (path[path.length-1].x == -1 ){ path.pop(); pathfinder=false;}
+        else if (addition==true) {path.splice(path.length-2,1);path.push(finalLocation);}
     }
-    if (path[path.length-1].x == -1 ){ path.pop(); pathfinder=false;}
-    else if (addition==true) {path.splice(path.length-2,1)}
+
 }
 
 //////////////////////////////////*****************///////////////////////////////////
 
-function drawschema(){
-    let {width, height}=getCanvasSize();
-    if(endWidth==0 && endHeight==0){
-        
-        while (width%sizeSquare !=0 ){width--;startWidth++;}
-        startWidth = Math.floor(startWidth / 2)-1;
-        endWidth = width + startWidth;
-    
-        while (height%sizeSquare !=0 ){height--; startHeight++;}
-        startHeight = Math.floor(startHeight / 2)-1;
-        endHeight = height + startHeight;
-    }
 
-    for(let i=startHeight; i<endHeight; i+=sizeSquare){
-        for(let j=startWidth; j<endWidth; j+=sizeSquare){
+/*********************************PathFinder without randomMazeGenerator***************************************/
+function verifyPositionLocation2(x,y){
+    if(finalLocation.x==x && finalLocation.y==y){
+        return true;
+    
+    }else{
+        for (let i =0; i<state.length; i++){
+            if (state[i].x==x && state[i].y==y){
+                return false;
+            }}
+    }
+    for (let i =0; i<path.length-1; i++){
+        if (path[i].x==x && path[i].y==y){
+            return false;
+    }}
+    if(x>endWidth-sizeSquare ||x<0 || y<0 ||y>endHeight-sizeSquare){return false}   
+    return true ;
+}
+function testTouch(x,y){
+    for (let i =0; i<state.length; i++){
+        if (state[i].x==x && Math.abs(y -state[i].y)==sizeSquare){
+            return true;
+        }else if(state[i].y==y && Math.abs(x -state[i].x)==sizeSquare){
+            return true;
+        }else if(Math.abs(x -state[i].x)==sizeSquare && Math.abs(y -state[i].y)==sizeSquare){
+            return true;
+        }
+    }
+    return false;
+}
+
+function pushPop(x1,y1){
+    path.pop();path.push({x:x1, y:y1}); path.push({x:finalLocation.x, y:finalLocation.y});
+    return true;
+}
+function PathFinder2(){
+    controlSpeed=0;
+    k=path.length-2; 
+    let x1, y1;
+    let position = false;
+
+    while(!position || controlSpeed<speed){
+
+        left=false; right=false; up=false; down=false; 
+        x1=path[k].x, y1=path[k].y;
+
+        if(verifyPositionLocation2(x1+sizeSquare, y1)){right=true}
+        if(verifyPositionLocation2(x1-sizeSquare, y1)){left=true}
+        if(verifyPositionLocation2(x1, y1-sizeSquare)){up=true}
+        if(verifyPositionLocation2(x1, y1+sizeSquare)){down=true}
+
+        if (Math.abs(x1+sizeSquare - path[k+1].x) < Math.abs(x1 - path[k+1].x) && right )     {position = pushPop(x1+sizeSquare,y1);}
+        else if(Math.abs(x1-sizeSquare - path[k+1].x) < Math.abs(x1 - path[k+1].x) && left )  {position = pushPop(x1-sizeSquare,y1);}
+        else if (Math.abs(y1-sizeSquare - path[k+1].y) < Math.abs(y1 - path[k+1].y) && up )   {position = pushPop(x1,y1-sizeSquare);}
+        else if (Math.abs(y1+sizeSquare - path[k+1].y) < Math.abs(y1 - path[k+1].y) && down ) {position = pushPop(x1,y1+sizeSquare);}
+        else{
+
+            if (right && testTouch(x1+sizeSquare,y1))       {position = pushPop(x1+sizeSquare,y1);}
+            else if (left && testTouch(x1-sizeSquare,y1))   {position = pushPop(x1-sizeSquare,y1);}
+            else if(up && testTouch(x1,y1-sizeSquare))      {position = pushPop(x1,y1-sizeSquare);}
+            else if (down && testTouch(x1,y1+sizeSquare))   {position = pushPop(x1,y1+sizeSquare);}
+
+            else{
+                if (right )     {position = pushPop(x1+sizeSquare,y1);}
+                if (left )      {position = pushPop(x1-sizeSquare,y1);}
+                if(up )         {position = pushPop(x1,y1-sizeSquare);}
+                if (down )      {position = pushPop(x1,y1+sizeSquare);}
+            }
+        }
+        if(!position){if (k>0) {k--;x1=path[k].x; y1=path[k].y} else {position=true; finder=false;}}
+        else {
+            if(path[path.length-2].x==finalLocation.x && path[path.length-2].y==finalLocation.y){finder=false;path.pop(); controlSpeed=speed;}   
+            else{
+                controlSpeed++;
+                k=path.length-2; 
+            }
+        }
+    } 
+}
+
+
+
+
+
+//////////////////////////////////****************///////////////////////////////////
+
+function drawschema(){
+
+    for(let i=0; i<endHeight; i+=sizeSquare){
+        for(let j=0; j<endWidth; j+=sizeSquare){
             if (randomG || randomMaze){
-                drawSquare(j,i,sizeSquare,'black','black');
+                drawSquare(j,i,sizeSquare,'black','black',0.5);
             }else {
-                drawSquare(j,i,sizeSquare,'white','aqua');
+                drawSquare(j,i,sizeSquare,'white','DarkSlateGrey',0.5);
             }
         }
     }
 
-    if (startLocation){drawSquare(startLocation.x, startLocation.y, sizeSquare,'red','red');if(path.length==0){path.push(startLocation);}}
-    if (finalLocation){drawSquare(finalLocation.x, finalLocation.y, sizeSquare,'green','green');if(path.length==1 || pathfinder){path.push(finalLocation);}}
-
+   
 
     if (maze.length > 0 ){
         for(let i=0; i<maze.length; i++){
-            drawSquare(maze[i].x,maze[i].y,sizeSquare,'white','aqua');
+            drawSquare(maze[i].x,maze[i].y,sizeSquare,'white','DarkSlateGrey',0.5);
         }
     }
+    if (startLocation){drawSquare(startLocation.x, startLocation.y, sizeSquare,'red','black',2);if(path.length==0){path.push(startLocation);}}
+    if (finalLocation){drawSquare(finalLocation.x, finalLocation.y, sizeSquare,'green','black',2);if(path.length==1){path.push(finalLocation);}}
+
 
     if (state.length > 0 ){
         for(let i=0; i<state.length; i++){
@@ -383,26 +468,26 @@ function drawschema(){
         }
     }
     if (path.length > 0){
-        for(let i=0; i<path.length; i++){
-            if(i!=0 && i!=path.length-1){
-                drawSquare(path[i].x,path[i].y,sizeSquare,'aqua','black');
-            }
+        for(let i=1; i<path.length-1; i++){
+                drawSquare(path[i].x,path[i].y,sizeSquare,'aqua','black',0.5);
         }
     }
     if (falsePath.length > 0 ){
         for(let i=0; i<falsePath.length; i++){
-            drawSquare(falsePath[i].x,falsePath[i].y,sizeSquare,'aqua','black');
+            drawSquare(falsePath[i].x,falsePath[i].y,sizeSquare,'aqua','black',0.5);
         }
     }
     if(randomMaze && !pathfinder){
-        if(path.length>2){
+        controlSpeed=0;
+        while(path.length>2 && controlSpeed<speed){
             correctPath.push(path[path.length-2]);
             path.splice(path.length-2,1);
+            controlSpeed++;
         }
     }
     if (correctPath.length > 0 ){
         for(let i=0; i<correctPath.length; i++){
-            drawSquare(correctPath[i].x,correctPath[i].y,sizeSquare,'yellow','black'); 
+            drawSquare(correctPath[i].x,correctPath[i].y,sizeSquare,'yellow','black',1); 
         }
     }
 
@@ -420,6 +505,9 @@ function renderGame() {
     }
     if(pathfinder){
         pathFinder();
+    }
+    if(finder){
+        PathFinder2();
     }
     drawschema();
     
@@ -449,10 +537,10 @@ function checkMaze(pos){
 
 function mousePosition(){
 
-    if(mouseX>=startWidth && mouseX<=endWidth-1 && mouseY>=startHeight && mouseY<=endHeight-1){
+    if(mouseX>=0 && mouseX<=endWidth-1 && mouseY>=0 && mouseY<=endHeight-1){
         
-        mouseX = Math.floor(mouseX)-10;
-        mouseY = Math.floor(mouseY)-10;
+        mouseX = Math.floor(mouseX);
+        mouseY = Math.floor(mouseY);
     
         while (mouseX % sizeSquare !=0){
             mouseX -- ;
@@ -460,7 +548,6 @@ function mousePosition(){
         while (mouseY % sizeSquare !=0){
             mouseY -- ;
         }
-        mouseX+=startWidth; mouseY+=startHeight;
 
         if(!startLocation){
             if(randomMaze){checkMaze(startLocation);}
@@ -480,7 +567,7 @@ function mousePosition(){
                     return false;
                 }
             }
-            if(randomMaze){
+            if(randomMaze ){
                 checkMaze(state);
             }
             else{if( (mouseX!=startLocation.x || mouseY!=startLocation.y) && (mouseX!=finalLocation.x || mouseY!=finalLocation.y)){state.push({x:mouseX , y:mouseY});}}
@@ -526,9 +613,10 @@ function main() {
 
     document.addEventListener('keyup', (e) => {
         switch (e.key){
-            case 'r': state.length =0, maze.length=0, path.length=0,falsePath.length=0,pathfinder=false, randomG=false, randomMaze=false, k=undefined, startLocation=undefined, finalLocation=undefined ; break;
+            case 'r': state.length =0, maze.length=0, path.length=0,correctPath.length=0, falsePath.length=0,pathfinder=false,finder=false; randomG=false, randomMaze=false, k=undefined, startLocation=undefined, finalLocation=undefined ; break;
             case 'g': if( state.length==0 && !startLocation && !finalLocation){randomG = true}; break;
-            case 'f': if (startLocation && finalLocation){pathfinder = true;}; break;
+            case 'f':   if (startLocation && finalLocation && randomMaze){pathfinder = true;}
+                        else if (startLocation && finalLocation && !randomMaze && !pathfinder){finder=true;}; break;
         }
     })
     

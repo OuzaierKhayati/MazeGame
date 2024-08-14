@@ -5,13 +5,32 @@
 }
 
 body {
-    background: #bdbdfe;
+    background:url(background3.png);
     padding: 1rem;
 }
 
 
 .center {
     text-align: center;
-    color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
     margin-bottom: 10px;
 }
+
+
+/* Customize the scrollbar container */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+  }
+  /* Customize the scrollbar track */
+  ::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 0%, 0.853); /* Background color of the track */
+  }
+  /* Customize the scrollbar thumb */
+  ::-webkit-scrollbar-thumb {
+    background: hsl(0, 0%, 44%); /* Color of the thumb */
+    border-radius: 6px; /* Rounded corners of the thumb */
+  }
+  /* Customize the scrollbar thumb on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(0, 0%, 34%); /* Color of the thumb on hover */
+  }
