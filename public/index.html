@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MazeGame</title>
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">-->
 </head>
 
 <body style="height: 95vh;">
@@ -12,11 +13,48 @@
         Maze generator && Path finder
     </h1>
     <div style="width: 70%; height: 90%!important; margin: auto;">
-        <canvas id="game-canvas" style="border:2px solid #000000; border-radius: 10px; box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.72);">
+        <canvas id="game-canvas" style="border:2px solid #000000; border-radius: 10px; box-shadow: 10px 10px 5px rgba(92, 92, 92, 0.72);">
         </canvas>
     </div>
-
+    <div class="container" id="container">
+        <div class="left-box" id="left-box">
+            <p><u>Tips:</u> Generate a maze, set the start and final location and
+                finally start the path finding process, or you can use your 
+            mouse to draw your own obstacles.</p>
+            <ul>
+                <li>Press <b>G/g</b> to generate a maze</li>
+                <li>Press <b>R/r</b> to empty the grid</li>
+                <li>Press <b>F/f</b> to find the path</li>
+            </ul>
+        </div>
+        <button id="container-button"onclick="toggleSidebar()">></button>
+    </div>
 </body>
-<script src="main.js" defer></script>
 
+<script src="main.js" defer></script>
+<script>
+    const container = document.getElementById("container");
+    const leftBox = document.getElementById("left-box");
+    const button = document.getElementById("container-button");
+    function toggleSidebar(){
+        if (button.textContent === ">"){
+            leftBox.classList.add("hidden");
+
+            setTimeout(() =>{
+                container.classList.add("containerSize");
+                button.textContent = "<";
+                button.style.marginRight ="20px";
+            },340);
+        }
+        else{
+            setTimeout(() => {
+                container.classList.remove("containerSize");
+                button.textContent = ">";
+                button.style.marginRight ="1px";
+                leftBox.classList.remove("hidden");
+            }, 500);
+        }
+
+    }
+</script>
 </html>

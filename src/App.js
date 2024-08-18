@@ -2,7 +2,7 @@
 const canvas = getCanvas();
 const ctx = canvas.getContext("2d");
 const rect = canvas.getBoundingClientRect();//get the canva's bounding rectangle
-const sizeSquare = 20, speed=2;
+const sizeSquare = 20, speed=3;
 let controlSpeed;
 
 const state = [];
