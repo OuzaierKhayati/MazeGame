@@ -240,13 +240,13 @@ function correctDirection(i){
     if (cross>=2){
 
         crossRoad.push({p:i, x:path[i].x, y:path[i].y, r:right, l:left, u:up, d:down}); // don't forget the declaration of the table crossRoad!!
-        lengthCross = crossRoad.length-1;
-
+        
         while (crossRoad.length > 0){
-
+            
+            lengthCross = crossRoad.length-1;
             i=crossRoad[lengthCross].p;
             x1=path[i].x; y1=path[i].y;
-            resultOfChangeRoad = changeRoads(lengthCross, x1,y1,i);
+            resultOfChangeRoad = changeRoads(lengthCross, x1,y1);
             for(let h=path.length-2; h>i; h--){
                 falsePath.push(path[h]);
                 path.splice(h,1);
@@ -255,7 +255,7 @@ function correctDirection(i){
             if ( !resultOfChangeRoad ){
 
                 if(!crossRoad[lengthCross].r && !crossRoad[lengthCross].l && !crossRoad[lengthCross].u && !crossRoad[lengthCross].d)
-                    {crossRoad.pop(); lengthCross=crossRoad.length-1; i=crossRoad[lengthCross].p;
+                    {crossRoad.pop(); lengthCross=crossRoad.length-1; if(lengthCross>=0){i=crossRoad[lengthCross].p;}
                         for(let h=path.length-2; h>i; h--){
                             falsePath.push(path[h]);
                             path.splice(h,1);
@@ -280,12 +280,12 @@ function correctDirection(i){
         else if ( up) {return {x:x1, y:y1-sizeSquare};}
         else if ( down) {return {x:x1, y:y1+sizeSquare};}
         else {
-            lengthCross = crossRoad.length-1;
             while (crossRoad.length > 0){
                 
+                lengthCross = crossRoad.length-1;
                 i=crossRoad[lengthCross].p;
                 x1=path[i].x; y1=path[i].y;
-                resultOfChangeRoad = changeRoads(lengthCross, x1,y1,i)
+                resultOfChangeRoad = changeRoads(lengthCross, x1,y1)
                 for(let h=path.length-2; h>i; h--){
                     falsePath.push(path[h]);
                     path.splice(h,1);
@@ -293,13 +293,13 @@ function correctDirection(i){
 
                 if ( !resultOfChangeRoad ){
 
-                    if(!crossRoad[lengthCross].r && !crossRoad[lengthCross].l && !crossRoad[lengthCross].u && !crossRoad[lengthCross].d)
-                        {crossRoad.pop(); lengthCross=crossRoad.length-1; i=crossRoad[lengthCross].p;
-                            for(let h=path.length-2; h>i; h--){
-                                falsePath.push(path[h]);
-                                path.splice(h,1);
-                            }
+                    if(!crossRoad[lengthCross].r && !crossRoad[lengthCross].l && !crossRoad[lengthCross].u && !crossRoad[lengthCross].d){
+                        crossRoad.pop(); lengthCross=crossRoad.length-1; if(lengthCross>=0){i=crossRoad[lengthCross].p;}
+                        for(let h=path.length-2; h>i; h--){
+                            falsePath.push(path[h]);
+                            path.splice(h,1);
                         }
+                    }
                     else {
                         if ( crossRoad[lengthCross].r) {crossRoad[lengthCross].r=false; return {x:x1+sizeSquare, y:y1};}
                         else if ( crossRoad[lengthCross].l) {crossRoad[lengthCross].l=false; return {x:x1-sizeSquare, y:y1};}
@@ -317,17 +317,17 @@ function correctDirection(i){
         
 }
 
-function changeRoads(lengthCross, x1,y1,i){
-    if ( crossRoad[lengthCross].r && Math.abs(x1+sizeSquare - path[i+1].x) < Math.abs(x1 - path[i+1].x)  ){
+function changeRoads(lengthCross, x1,y1){
+    if ( crossRoad[lengthCross].r && Math.abs(x1+sizeSquare - finalLocation.x) < Math.abs(x1 - finalLocation.x)  ){
         crossRoad[lengthCross].r = false; return {x:x1+sizeSquare, y:y1};
 
-    }else if ( crossRoad[lengthCross].u && Math.abs(y1-sizeSquare - path[i+1].y) < Math.abs(y1 - path[i+1].y)  ){
+    }else if ( crossRoad[lengthCross].u && Math.abs(y1-sizeSquare - finalLocation.y) < Math.abs(y1 - finalLocation.y)  ){
         crossRoad[lengthCross].u = false; return {x:x1, y:y1-sizeSquare};
     
-    }else if ( crossRoad[lengthCross].l && Math.abs(x1-sizeSquare - path[i+1].x) < Math.abs(x1 - path[i+1].x)  ){
+    }else if ( crossRoad[lengthCross].l && Math.abs(x1-sizeSquare - finalLocation.x) < Math.abs(x1 - finalLocation.x)  ){
         crossRoad[lengthCross].l = false; return {x:x1-sizeSquare, y:y1};
     
-    }else if ( crossRoad[lengthCross].d && Math.abs(y1+sizeSquare - path[i+1].y) < Math.abs(y1 - path[i+1].y)  ){
+    }else if ( crossRoad[lengthCross].d && Math.abs(y1+sizeSquare - finalLocation.y) < Math.abs(y1 - finalLocation.y)  ){
         crossRoad[lengthCross].d = false; return {x:x1, y:y1+sizeSquare};
     }
     else {return false ;}
@@ -344,7 +344,7 @@ function pathFinder(){
             pathfinder=false;
         }
         else {path.push (correctDirection(i)); addition = true;controlSpeed++;}
-        if (path[path.length-1].x == -1 ){ path.pop(); pathfinder=false;}
+        if (path[path.length-1].x == -1 ){ path=[startLocation, finalLocation]; pathfinder=false;}
         else if (addition==true) {path.splice(path.length-2,1);path.push(finalLocation);}
     }
 
