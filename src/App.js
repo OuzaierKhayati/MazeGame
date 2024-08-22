@@ -2,7 +2,7 @@
 const canvas = getCanvas();
 const ctx = canvas.getContext("2d");
 const rect = canvas.getBoundingClientRect();//get the canva's bounding rectangle
-const sizeSquare = 20, speed=3;
+const sizeSquare = 20, speed=10;
 let controlSpeed;
 
 const state = [];
@@ -24,18 +24,16 @@ function getCanvas() {
     const canvas = document.querySelector("#game-canvas");
     return canvas;
 }
-
 function setCanvasSize() {
     const parent = canvas.parentNode;
+
     canvas.width = parent.offsetWidth;
-    while(canvas.width%sizeSquare !=0){
-        canvas.width++;
-    }endWidth=canvas.width;
+    canvas.width += (sizeSquare - (canvas.width % sizeSquare)) % sizeSquare;
+    endWidth=canvas.width;
     
     canvas.height = parent.offsetHeight;
-    while(canvas.height%sizeSquare !=0){
-        canvas.height++;
-    }endHeight=canvas.height;
+    canvas.height += (sizeSquare - (canvas.height % sizeSquare)) % sizeSquare;
+    endHeight=canvas.height;
 }
 
 function clearScreen() {
@@ -317,7 +315,11 @@ function pathFinder(){
             pathfinder=false;
 
         }else {path.push (correctDirection(i)); addition = true;controlSpeed++;}
-        if (path[path.length-1].x == -1 ){ path=[startLocation, finalLocation]; pathfinder=false;
+        if (path[path.length-1].x == -1 ){ 
+            for(let i=1; i<path.length-2; i++){
+                falsePath.push(path[i]);
+            }
+            path=[startLocation, finalLocation];pathfinder=false;
         }else if (addition==true) {path.splice(path.length-2,1);path.push(finalLocation);}
     }
 }
@@ -499,17 +501,13 @@ function checkMaze(pos){
 }
 function mousePosition(){
 
-    if(mouseX>=0 && mouseX<=endWidth-1 && mouseY>=0 && mouseY<=endHeight-1){
+    if(mouseX>=0 && mouseX<=endWidth && mouseY>=0 && mouseY<=endHeight){
         
         mouseX = Math.floor(mouseX);
         mouseY = Math.floor(mouseY);
     
-        while (mouseX % sizeSquare !=0){
-            mouseX -- ;
-        }
-        while (mouseY % sizeSquare !=0){
-            mouseY -- ;
-        }
+        mouseX -= (sizeSquare + (mouseX % sizeSquare)) % sizeSquare;
+        mouseY -= (sizeSquare + (mouseY % sizeSquare)) % sizeSquare; 
 
         if(!startLocation){
             if(randomMaze){checkMaze(startLocation);}
