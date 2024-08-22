@@ -11,7 +11,7 @@ let mouseX, mouseY, endWidth, endHeight, isMouseDown=false;
 let finder=false;
 
 let maze=[], left, right, up, down, position, randomDirection, counter=0, k; 
-let randomG =false, randomMaze=false ;
+let randomG =false, randomMaze=false ; // Normally I have to declare x1 and y1 here to be able to use them in the maze function
 
 
 let startLocation,finalLocation,pathfinder=false;
@@ -51,15 +51,15 @@ function drawSquare(x, y, size, fill,border,bordersize) {
 }
 
 /*************************************MazeGenerator***********************************/
-function testCounter(bool){
-    if ( k>=2 && counter == 0 && k==maze.length &&  (x1==maze[k-2].x && y1==maze[k-2].y) ){bool.value = false ; randomDirection=Math.floor(Math.random()*4); return false}
-    else if ((counter ==0 || counter==2) && k==maze.length){ return testSquares(k-1,k-2,bool); }
+function testCounter(){
+    if ( k>=2 && counter == 0 && k==maze.length &&  (x1==maze[k-2].x && y1==maze[k-2].y) ){ return false}
+    else if ((counter ==0 || counter==2) && k==maze.length){ return testSquares(k-1,k-2); }
 
-    else if(counter == 0 && k!=maze.length && ((x1==maze[a].x && y1==maze[a].y) || (x1==maze[c].x && y1==maze[c].y)) ){bool.value = false ; randomDirection=Math.floor(Math.random()*4); return false}
-    else if (counter==0 && k!=maze.length) {return firstTestSquares(a,b,c,bool)}
+    else if(counter == 0 && k!=maze.length && ((x1==maze[a].x && y1==maze[a].y) || (x1==maze[c].x && y1==maze[c].y)) ){ return false}
+    else if (counter==0 && k!=maze.length) {return firstTestSquares(a,b,c)}
 
-    else if (counter == 1 && (x1==maze[b].x && y1==maze[b].y) ){bool.value = false ; randomDirection=Math.floor(Math.random()*4); return false}
-    else if (counter == 1 ) {return testSquares(k-1,b,bool)}
+    else if (counter == 1 && (x1==maze[b].x && y1==maze[b].y) ){ return false}
+    else if (counter == 1 ) {return testSquares(k-1,b)}
 
 }
 
@@ -71,35 +71,33 @@ function testFor(i){
     else {return true}
 }
 
-function testSquares(a,b,direction){
+function testSquares(a,b){
     let i;
     for (i=0; i<maze.length; i++){
 
         if (i==b ){
-            if( Math.abs(y1-maze[i].y)==sizeSquare && x1==maze[i].x){randomDirection=Math.floor(Math.random()*4); direction.value=false; break;}
-            else if( Math.abs(x1-maze[i].x)==sizeSquare && y1==maze[i].y){randomDirection=Math.floor(Math.random()*4); direction.value=false; break;}}
+            if( Math.abs(y1-maze[i].y)==sizeSquare && x1==maze[i].x){ return false;}
+            else if( Math.abs(x1-maze[i].x)==sizeSquare && y1==maze[i].y){ return false;}}
             
                         
         else if (i!= a && i!= b){
             if (!testFor(i)) {
-                randomDirection=Math.floor(Math.random()*4); direction.value=false; break;
+                 return false;
             }        
     }}
-    if(i==maze.length){counter=0;return true}                                         
-    else {return false;}
+    counter=0; return true;                                         
 }
 
-function firstTestSquares(a,b,c,direction){
+function firstTestSquares(a,b,c){
     let i;
     for (i=0; i<maze.length; i++){
 
         if (i!= a && i!= b && i!=c){
             if (!testFor(i)) {
-                randomDirection=Math.floor(Math.random()*4); direction.value=false; break;
+                 return false;
             }
         }}
-    if (i==maze.length){counter++;return true}
-    else {return false;}
+    counter++; return true;
 }
 
 function randomDirectionTest(a,b,direction,position){
@@ -108,25 +106,31 @@ function randomDirectionTest(a,b,direction,position){
         
     if ((0<=x1) && (x1<=endWidth-sizeSquare) && (0<=y1) && (y1<=endHeight-sizeSquare) && direction.value ){
 
-        if (testCounter(direction)) {
-            position.value = true;controlSpeed++; maze.push({x:x1, y:y1}); k=maze.length; }
+        if (testCounter()) {
+            position.value = true; controlSpeed++; maze.push({x:x1, y:y1}); k=maze.length; 
+        }else{ direction.value = false ;} //randomDirection=Math.floor(Math.random()*4);
                 
-    }else{ direction.value = false ; randomDirection=Math.floor(Math.random()*4);}
+    }else{ direction.value = false ; }//randomDirection=Math.floor(Math.random()*4);
 
 
 }
+//I didn't declared x and y and everything in maze Generator is working without any error !!!!
 
 function mazeGenerator(){
     controlSpeed=0;
-    randomDirection=Math.floor(Math.random()*4),position={value:false};
-    left={value: true}, right={value: true}, up={value: true}, down={value: true};
+    position={value:true};
+
     if (k==undefined){
         maze.push({x:(Math.floor(Math.random()*36)+1)*sizeSquare, y:(Math.floor(Math.random()*20)+1)*sizeSquare});
         k=maze.length;
-    }
-    else {
+    
+    }else {
         while (!position.value || controlSpeed<speed){
+            if(position.value){
+                left={value: true}; right={value: true}; up={value: true}; down={value: true};
+            }
             position.value = false;
+            randomDirection=Math.floor(Math.random()*4);// if i remove it from here and i put it just in the else condition of the function randomDirectionTest it will be another type of maze
             if (!right.value && !left.value && !up.value && !down.value){
                 if (k>1){
                     if(counter==0 ){if (k==maze.length){k-=2;}else{k--;}; a=k+1; b=k; c=k-1;}
@@ -146,13 +150,7 @@ function mazeGenerator(){
         }
     }
 }
-
-
-
 ///////////////////////////////////****************///////////////////////////////////
-
-
-
 /***********************************PathFinder*****************************************/
 
 function verifyPositionLocation(x,y){
@@ -167,9 +165,6 @@ function verifyPositionLocation(x,y){
     }
     return false ;
 }
-    
-
-
 
 function correctDirection(i){
 
@@ -184,13 +179,11 @@ function correctDirection(i){
                     if (x1+sizeSquare != crossRoad[crossRoad.length-1].x || y1 != crossRoad[crossRoad.length-1].y ){
                         right = true; cross++;
                     }
-                }
-                else {
+                }else {
                     right = true; cross++;
                 }
             } 
-        }
-        else {right = true; cross++}}
+        }else {right = true; cross++}}
 
     if (verifyPositionLocation(x1-sizeSquare, y1)){
         if (i!=0){
@@ -199,13 +192,11 @@ function correctDirection(i){
                     if (x1-sizeSquare != crossRoad[crossRoad.length-1].x || y1 != crossRoad[crossRoad.length-1].y ){
                         left = true; cross++;
                     }
-                }
-                else {
+                }else {
                     left = true; cross++;
                 } 
             }
-        }
-        else {left = true; cross++}}
+        }else {left = true; cross++}}
 
     if (verifyPositionLocation(x1, y1-sizeSquare)){
         if (i!=0){
@@ -214,13 +205,11 @@ function correctDirection(i){
                     if (x1 != crossRoad[crossRoad.length-1].x || y1-sizeSquare != crossRoad[crossRoad.length-1].y ){
                         up = true; cross++;
                     }
-                }
-                else {
+                }else {
                     up = true; cross++;
                 } 
             } 
-        }
-        else {up = true; cross++}}
+        }else {up = true; cross++}}
 
     if (verifyPositionLocation(x1, y1+sizeSquare)){
         if (i!=0){
@@ -229,17 +218,14 @@ function correctDirection(i){
                     if (x1 != crossRoad[crossRoad.length-1].x || y1+sizeSquare != crossRoad[crossRoad.length-1].y ){
                         down = true; cross++;
                     }
-                }
-                else {
+                }else {
                     down = true; cross++;
                 } 
             } 
-        }
-        else {down = true; cross++}}
+        }else {down = true; cross++}}
 
     if (cross>=2){
-
-        crossRoad.push({p:i, x:path[i].x, y:path[i].y, r:right, l:left, u:up, d:down}); // don't forget the declaration of the table crossRoad!!
+        crossRoad.push({p:i, x:path[i].x, y:path[i].y, r:right, l:left, u:up, d:down});
         
         while (crossRoad.length > 0){
             
@@ -247,21 +233,16 @@ function correctDirection(i){
             i=crossRoad[lengthCross].p;
             x1=path[i].x; y1=path[i].y;
             resultOfChangeRoad = changeRoads(lengthCross, x1,y1);
+            
             for(let h=path.length-2; h>i; h--){
                 falsePath.push(path[h]);
                 path.splice(h,1);
             }
-
             if ( !resultOfChangeRoad ){
 
-                if(!crossRoad[lengthCross].r && !crossRoad[lengthCross].l && !crossRoad[lengthCross].u && !crossRoad[lengthCross].d)
-                    {crossRoad.pop(); lengthCross=crossRoad.length-1; if(lengthCross>=0){i=crossRoad[lengthCross].p;}
-                        for(let h=path.length-2; h>i; h--){
-                            falsePath.push(path[h]);
-                            path.splice(h,1);
-                        }
-                    }
-                else {
+                if(!crossRoad[lengthCross].r && !crossRoad[lengthCross].l && !crossRoad[lengthCross].u && !crossRoad[lengthCross].d){
+                    crossRoad.pop();             
+                }else {
                     if ( crossRoad[lengthCross].r) {crossRoad[lengthCross].r=false; return {x:x1+sizeSquare, y:y1};}
                     else if ( crossRoad[lengthCross].l) {crossRoad[lengthCross].l=false; return {x:x1-sizeSquare, y:y1};}
                     else if ( crossRoad[lengthCross].u) {crossRoad[lengthCross].u=false; return {x:x1, y:y1-sizeSquare};}
@@ -269,12 +250,11 @@ function correctDirection(i){
             
             }else {
                 return resultOfChangeRoad;
-            }
-            
+            }          
         }
         if (crossRoad.length == 0 ){return {x:-1}}
-    }
-    else {
+
+    }else {
         if ( right) {return {x:x1+sizeSquare, y:y1};}
         else if ( left) {return {x:x1-sizeSquare, y:y1};}
         else if ( up) {return {x:x1, y:y1-sizeSquare};}
@@ -286,21 +266,16 @@ function correctDirection(i){
                 i=crossRoad[lengthCross].p;
                 x1=path[i].x; y1=path[i].y;
                 resultOfChangeRoad = changeRoads(lengthCross, x1,y1)
+
                 for(let h=path.length-2; h>i; h--){
                     falsePath.push(path[h]);
                     path.splice(h,1);
                 }
-
                 if ( !resultOfChangeRoad ){
 
                     if(!crossRoad[lengthCross].r && !crossRoad[lengthCross].l && !crossRoad[lengthCross].u && !crossRoad[lengthCross].d){
-                        crossRoad.pop(); lengthCross=crossRoad.length-1; if(lengthCross>=0){i=crossRoad[lengthCross].p;}
-                        for(let h=path.length-2; h>i; h--){
-                            falsePath.push(path[h]);
-                            path.splice(h,1);
-                        }
-                    }
-                    else {
+                        crossRoad.pop();
+                    }else {
                         if ( crossRoad[lengthCross].r) {crossRoad[lengthCross].r=false; return {x:x1+sizeSquare, y:y1};}
                         else if ( crossRoad[lengthCross].l) {crossRoad[lengthCross].l=false; return {x:x1-sizeSquare, y:y1};}
                         else if ( crossRoad[lengthCross].u) {crossRoad[lengthCross].u=false; return {x:x1, y:y1-sizeSquare};}
@@ -308,13 +283,11 @@ function correctDirection(i){
                 
                 }else {
                     return resultOfChangeRoad;
-                }
-                
+                }   
             }
             if (crossRoad.length == 0  ){return {x:-1}}
         }
-    }
-        
+    }       
 }
 
 function changeRoads(lengthCross, x1,y1){
@@ -342,18 +315,16 @@ function pathFinder(){
         if(path[i].y==path[path.length-1].y && path[i].x==path[path.length-1].x ){
             path.pop();
             pathfinder=false;
-        }
-        else {path.push (correctDirection(i)); addition = true;controlSpeed++;}
-        if (path[path.length-1].x == -1 ){ path=[startLocation, finalLocation]; pathfinder=false;}
-        else if (addition==true) {path.splice(path.length-2,1);path.push(finalLocation);}
-    }
 
+        }else {path.push (correctDirection(i)); addition = true;controlSpeed++;}
+        if (path[path.length-1].x == -1 ){ path=[startLocation, finalLocation]; pathfinder=false;
+        }else if (addition==true) {path.splice(path.length-2,1);path.push(finalLocation);}
+    }
 }
 
 //////////////////////////////////*****************///////////////////////////////////
-
-
 /*********************************PathFinder without randomMazeGenerator***************************************/
+
 function verifyPositionLocation2(x,y){
     if(finalLocation.x==x && finalLocation.y==y){
         return true;
@@ -414,7 +385,6 @@ function PathFinder2(){
             else if (left && testTouch(x1-sizeSquare,y1))   {position = pushPop(x1-sizeSquare,y1);}
             else if(up && testTouch(x1,y1-sizeSquare))      {position = pushPop(x1,y1-sizeSquare);}
             else if (down && testTouch(x1,y1+sizeSquare))   {position = pushPop(x1,y1+sizeSquare);}
-
             else{
                 if (right )     {position = pushPop(x1+sizeSquare,y1);}
                 if (left )      {position = pushPop(x1-sizeSquare,y1);}
@@ -424,18 +394,14 @@ function PathFinder2(){
         }
         if(!position){if (k>0) {k--;x1=path[k].x; y1=path[k].y} else {position=true; finder=false;}}
         else {
-            if(path[path.length-2].x==finalLocation.x && path[path.length-2].y==finalLocation.y){finder=false;path.pop(); controlSpeed=speed;}   
-            else{
+            if(path[path.length-2].x==finalLocation.x && path[path.length-2].y==finalLocation.y){finder=false;path.pop(); controlSpeed=speed;  
+            }else{
                 controlSpeed++;
                 k=path.length-2; 
             }
         }
     } 
 }
-
-
-
-
 
 //////////////////////////////////****************///////////////////////////////////
 
@@ -450,8 +416,6 @@ function drawschema(){
             }
         }
     }
-
-   
 
     if (maze.length > 0 ){
         for(let i=0; i<maze.length; i++){
@@ -493,7 +457,6 @@ function drawschema(){
 
 }
 
-
 function renderGame() {
 
     // Clear screen
@@ -524,17 +487,16 @@ function gameLoop() {
 function checkMaze(pos){
     for (let i =0; i<maze.length; i++){
         if (maze[i].x==mouseX && maze[i].y==mouseY){
-            if(pos==state){
-                pos.push({x:mouseX , y:mouseY});
-            }
+
+            if(pos==state) {pos.push({x:mouseX , y:mouseY});}
             else if(pos==startLocation) {startLocation={x:mouseX , y:mouseY};}
             else {finalLocation={x:mouseX , y:mouseY};}
+            
             maze.splice(i,1);
             return true;
         }
     }
 }
-
 function mousePosition(){
 
     if(mouseX>=0 && mouseX<=endWidth-1 && mouseY>=0 && mouseY<=endHeight-1){
@@ -582,7 +544,6 @@ function mousePosition(){
 
     mouseX=undefined ; mouseY=undefined;
 }
-
 function main() {
     // Set canvas width & height automatically
     setCanvasSize();
@@ -625,7 +586,6 @@ function main() {
     // Run game
     window.requestAnimationFrame(gameLoop)
 }
-
 
 /****Main call*****/
 main();
