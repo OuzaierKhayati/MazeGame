@@ -117,7 +117,7 @@ function randomDirectionTest(a,b,direction,position){
 function mazeGenerator(){
     controlSpeed=0;
     position={value:true};
-
+    //randomDirection=Math.floor(Math.random()*4);
     if (k==undefined){
         maze.push({x:(Math.floor(Math.random()*36)+1)*sizeSquare, y:(Math.floor(Math.random()*20)+1)*sizeSquare});
         k=maze.length;
