@@ -1,7 +1,7 @@
 {
   "name": "reactmazegenerator",
   "version": "1.0.0",
-  "homepage": "https://ouzaierkhayati.github.io/ReactMazeGame/",
+  "homepage": "https://ouzaierkhayati.github.io/MazeGame/",
   "description": "",
   "main": "/src/index.js",
   "scripts": {
