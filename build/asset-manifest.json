@@ -1,13 +1,14 @@
 {
   "files": {
-    "main.css": "/ReactMazeGame/static/css/main.5d14d55e.css",
-    "main.js": "/ReactMazeGame/static/js/main.2757faf2.js",
-    "index.html": "/ReactMazeGame/index.html",
-    "main.5d14d55e.css.map": "/ReactMazeGame/static/css/main.5d14d55e.css.map",
-    "main.2757faf2.js.map": "/ReactMazeGame/static/js/main.2757faf2.js.map"
+    "main.css": "/MazeGame/static/css/main.17022f03.css",
+    "main.js": "/MazeGame/static/js/main.87172cf1.js",
+    "static/media/background3.png": "/MazeGame/static/media/background3.24f488c6de214f764a61.png",
+    "index.html": "/MazeGame/index.html",
+    "main.17022f03.css.map": "/MazeGame/static/css/main.17022f03.css.map",
+    "main.87172cf1.js.map": "/MazeGame/static/js/main.87172cf1.js.map"
   },
   "entrypoints": [
-    "static/css/main.5d14d55e.css",
-    "static/js/main.2757faf2.js"
+    "static/css/main.17022f03.css",
+    "static/js/main.87172cf1.js"
   ]
 }
