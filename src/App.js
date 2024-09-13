@@ -1,8 +1,8 @@
 /******CONSTANTS*******/
 const canvas = getCanvas();
 const ctx = canvas.getContext("2d");
-const rect = canvas.getBoundingClientRect();//get the canva's bounding rectangle
 const sizeSquare = 20, speed=3;
+let rect = canvas.getBoundingClientRect();//get the canva's bounding rectangle
 let controlSpeed;
 
 const state = [];
@@ -551,6 +551,9 @@ function main() {
 
     document.addEventListener('mousedown', (e) => {
         if(!randomG){
+            // Recalculate the bounding rectangle 
+            rect = canvas.getBoundingClientRect();
+
             mouseX = e.clientX - rect.left;
             mouseY = e.clientY - rect.top;
             mousePosition();
@@ -563,6 +566,9 @@ function main() {
 
     document.addEventListener('mousemove', (e) => {
         if(isMouseDown){
+            // Recalculate the bounding rectangle 
+            rect = canvas.getBoundingClientRect();
+
             mouseX = e.clientX - rect.left;
             mouseY = e.clientY - rect.top;
             // Calculate mouse position relative to the canvas
