@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/MazeGame/static/css/main.17022f03.css",
+    "main.js": "/MazeGame/static/js/main.87172cf1.js",
+    "static/media/background3.png": "/MazeGame/static/media/background3.24f488c6de214f764a61.png",
+    "index.html": "/MazeGame/index.html",
+    "main.17022f03.css.map": "/MazeGame/static/css/main.17022f03.css.map",
+    "main.87172cf1.js.map": "/MazeGame/static/js/main.87172cf1.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.17022f03.css",
+    "static/js/main.87172cf1.js"
+  ]
+}
